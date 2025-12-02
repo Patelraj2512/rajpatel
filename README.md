@@ -18,10 +18,10 @@ To run this project locally, follow these steps:
 
 ```bash
 # Clone the repository
-git clone https://github.com/Patelraj2512/confession.git
+git clone https://github.com/Patelraj2512/rajpatel.git
 
 # Navigate into the folder
-cd confession-site
+cd rajpatel
 
 # Install dependencies
 npm install
