@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { motion, AnimatePresence } from "motion/react"
 import Loader from "@/components/Loader"
 import SecretCode from "@/components/SecretCode"
@@ -11,13 +11,34 @@ import PhotoGallery from "@/components/PhotoGallery"
 
 export default function ConfessionSite() {
   const [currentScreen, setCurrentScreen] = useState("loader")
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false)
+  const audioRef = useRef(null)
 
   const handleScreenChange = (screen) => {
     setCurrentScreen(screen)
   }
 
+  // Start background music directly from a user interaction (fixes autoplay issues)
+  const startMusic = () => {
+    if (!audioRef.current || isMusicPlaying) return
+
+    audioRef.current
+      .play()
+      .then(() => setIsMusicPlaying(true))
+      .catch(() => {
+        // Ignore autoplay errors silently (browser policy)
+      })
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-950/35 via-black/40 to-fuchsia-950/35 relative overflow-hidden">
+
+      {/* Background music (user-controlled for autoplay policies) */}
+      <audio
+        ref={audioRef}
+        src="/audio/bg.mp3"
+        loop
+      />
 
       <div className="fixed inset-0 z-0 blur-xl opacity-10" style={{
         backgroundImage: "radial-gradient(circle at 25% 30%, rgba(236,72,153,0.7), transparent 40%)",
@@ -35,7 +56,13 @@ export default function ConfessionSite() {
       <AnimatePresence mode="wait">
         {currentScreen === "loader" && <Loader key="loader" onComplete={() => handleScreenChange("secretCode")} />}
         {currentScreen === "secretCode" && (
-          <SecretCode key="secretCode" onUnlock={() => handleScreenChange("heartReveal")} />
+          <SecretCode
+            key="secretCode"
+            onUnlock={() => {
+              startMusic()
+              handleScreenChange("heartReveal")
+            }}
+          />
         )}
         {currentScreen === "heartReveal" && (
           <HeartReveal key="heartReveal" onComplete={() => handleScreenChange("confessionIntro")} />
